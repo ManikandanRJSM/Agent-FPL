@@ -4,7 +4,7 @@ import torch
 class ModelConfigurations:
 
     @staticmethod
-    def get_model_config():
+    def get_model_config() -> object:
         model_id = "meta-llama/Llama-3.2-3B"
         pipe = pipeline(
             "text-generation",
@@ -15,7 +15,7 @@ class ModelConfigurations:
         return pipe
 
     @staticmethod
-    def get_transformer_config():
+    def get_transformer_config() -> dict:
         return {
             "do_sample": True,
             "temperature": 0.7,
