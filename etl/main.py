@@ -17,9 +17,9 @@ import json
 import logging
 
 etl_logger = logging.getLogger(__name__)
+logging.basicConfig(filename='./logs/etl_logs/etl.log', level=logging.INFO)
 
 def extract() -> None:
-    logging.basicConfig(filename='./logs/etl_logs/extract.log', level=logging.INFO)
     try:
         etl_logger.info('Extract Started')
 
@@ -36,12 +36,25 @@ def extract() -> None:
 
 def transform(teams : list, players : list) -> None:
 
-    print(f"Type of players: {type(players)}")
-    print(f"Number of players in list: {len(players)}")
+    etl_logger.info('Transform Started')
+
+    etl_logger.info(f"Type of players: {type(players)}")
+    etl_logger.info(f"Number of players in list: {len(players)}")
+    
+    etl_logger.info(f"Type of teams: {type(teams)}")
+    etl_logger.info(f"Number of teams in list: {len(teams)}")
+
     spark_session = SparkSessionFactory.create_spark_session()
+
     players_rdd = spark_session.sparkContext.parallelize([json.dumps(p) for p in players])
     players_df = spark_session.read.json(players_rdd)
+
+    teams_rdd = spark_session.sparkContext.parallelize([json.dumps(t) for t in teams_rdd])
+    teams_df = spark_session.read.json(teams_rdd)
     print(players_df.printSchema())
+    print(teams_df.printSchema())
+
+    etl_logger.info('Finished Passing to load function')
 
 
 
