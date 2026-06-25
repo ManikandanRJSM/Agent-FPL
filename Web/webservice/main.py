@@ -33,10 +33,13 @@ def getManagerPlayers(manager_id : int, authorization: str | None = Header(None)
         "Accept": "application/json"
     }
     r = requests.get(f"https://fantasy.premierleague.com/api/my-team/{manager_id}/", headers=headers)
+    manger_reqt = requests.get(f'https://fantasy.premierleague.com/api/entry/{manager_id}')
     data = {}
 
-    if r.status_code == 200:
+    if r.status_code == 200 and manger_reqt.status_code == 200:
+        
         player_data = r.json()['picks']
+        manger_data = manger_reqt.json()
         player_df = spark_session.createDataFrame(player_data);
 
         all_players_df = spark_session.read.parquet("../../data/players").alias("players")
@@ -51,13 +54,22 @@ def getManagerPlayers(manager_id : int, authorization: str | None = Header(None)
         data = {
             'status_code' : r.status_code,
             'status' : 'SUCCESS',
-            'data' : [json.loads(row) for row in joined_df.toJSON().collect()]
+            'data' : {
+                'player_data' : [json.loads(row) for row in joined_df.toJSON().collect()],
+                'manager_data' : {
+                    'user_name' : manger_data['name'],
+                    'transfer_balance' : manger_data['last_deadline_bank'],
+                }
+            }
         }
     else:
         data = {
             'status_code' : r.status_code,
             'status' : 'FAILED',
-            'data' : r.json()
+            'data' : {
+                'player_data' : r.json(),
+                'manager_data' : manger_reqt.json()
+            }
         }
     
     return data

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FPL Agent — My Squad</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #37003c; color: #fff; }
+        .top-bar { background: #00ff87; color: #37003c; padding: 16px 24px; font-weight: 800; font-size: 1.3rem; }
+        .top-bar span { font-weight: 400; font-size: 0.9rem; }
+        .table-card { background: #fff; border-radius: 12px; overflow: hidden; }
+        .table thead { background: #37003c; color: #00ff87; }
+        .table tbody tr:hover { background: #f3f0f7; }
+        .badge-team { background: #37003c; color: #00ff87; font-size: 0.75rem; padding: 3px 8px; border-radius: 20px; }
+        .transfer-card { background: #1e0128; border-radius: 12px; padding: 24px; }
+        .transfer-card h5 { color: #00ff87; font-weight: 700; }
+        .btn-fpl { background: #00ff87; color: #37003c; font-weight: 700; border: none; }
+        .btn-fpl:hover { background: #00e07a; color: #37003c; }
+        .cost { color: #00ff87; font-weight: 700; }
+        a.back { color: #00ff87; text-decoration: none; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <div class="top-bar d-flex justify-content-between align-items-center">
+        <div>
+            <div>FPL Agent Assistant</div>
+            <span style="font-weight:400; font-size:0.9rem;">{{ manager_data.user_name }}</span>
+        </div>
+        <div class="d-flex align-items-center gap-4">
+            <div class="text-end">
+                <div style="font-size:0.75rem; font-weight:400;">Transfer Balance</div>
+                <div style="font-size:1.1rem;">&pound;{{ "%.1f"|format(manager_data.transfer_balance / 10) }}m</div>
+            </div>
+            <a href="/" class="back">&#8592; Change Manager</a>
+        </div>
+    </div>
+
+    <div class="container py-4">
+
+        {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
+
+        <h5 class="text-white mb-3">Your Squad ({{ players | length }} players)</h5>
+
+        <div class="table-card mb-4">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Player</th>
+                        <th>Value</th>
+                        <th>Team</th>
+                    </tr>
+                </thead>
+                <tbody class="text-dark">
+                    {% for p in players %}
+                    <tr>
+                        <td class="text-muted">{{ p.id }}</td>
+                        <td><strong>{{ p.first_name }} {{ p.second_name }}</strong></td>
+                        <td class="cost">&pound;{{ "%.1f"|format(p.now_cost / 10) }}m</td>
+                        <td>
+                            {{ p.name }}
+                            <span class="badge-team ms-1">{{ p.short_name }}</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="transfer-card">
+            <h5>Transfer Suggestion</h5>
+            <p class="text-white-50 mb-3">Enter the Player ID you want a transfer suggestion for</p>
+            {% if error %}
+            <div class="alert alert-danger py-2">{{ error }}</div>
+            {% endif %}
+            <form action="/transfer" method="POST" class="d-flex gap-3 align-items-end">
+                <div class="flex-grow-1">
+                    <label class="form-label text-white-50 small">Player ID</label>
+                    <input type="number" name="player_id" class="form-control" placeholder="e.g. 328" required>
+                </div>
+                <button type="submit" class="btn btn-fpl px-4 py-2">Get Suggestion</button>
+            </form>
+        </div>
+
+    </div>
+</body>
+</html>
