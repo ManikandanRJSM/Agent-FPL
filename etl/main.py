@@ -8,7 +8,7 @@ if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
 
 
-from utils.SparkUtils import SparkSessionFactory
+from Utils.SparkUtils import SparkSessionFactory
 from pyspark.sql.functions import explode, col
 #from helpers.GetEnv import GetEnv
 import requests
@@ -26,15 +26,14 @@ def extract() -> None:
         r = requests.get('https://fantasy.premierleague.com/api/bootstrap-static/')
         if r.status_code == 200:
             data = r.json()
-            # print(data['elements'])
-            transform(data['teams'], data['elements'])
+            transform(data['teams'], data['elements'], data['element_types'])
 
             etl_logger.info('Extract Finished Passing to transform function')
     except Exception as e:
         etl_logger.error(e)
 
 
-def transform(teams : list, players : list) -> None:
+def transform(teams : list, players : list, postion : list) -> None:
 
     etl_logger.info('Transform Started')
 
@@ -49,17 +48,29 @@ def transform(teams : list, players : list) -> None:
     players_rdd = spark_session.sparkContext.parallelize([json.dumps(p) for p in players])
     players_df = spark_session.read.json(players_rdd)
 
-    teams_rdd = spark_session.sparkContext.parallelize([json.dumps(t) for t in teams_rdd])
+    teams_rdd = spark_session.sparkContext.parallelize([json.dumps(t) for t in teams])
     teams_df = spark_session.read.json(teams_rdd)
-    print(players_df.printSchema())
-    print(teams_df.printSchema())
+
+    postion_rdd = spark_session.sparkContext.parallelize([json.dumps(et) for et in postion])
+    postion_df = spark_session.read.json(postion_rdd)
+    # players_df.select('element_type').show()
+    # exit()
+    # print(teams_df.printSchema())
 
     etl_logger.info('Finished Passing to load function')
 
+    load(teams_df = teams_df, players_df = players_df, element_types_df = postion_df)
 
 
-def load():
-    return None
+
+def load(**data : dict) -> None:
+
+    etl_logger.info('Load Started')
+    data['teams_df'].write.mode("overwrite").parquet(f"./data/teams")
+    data['players_df'].write.mode("overwrite").parquet(f"./data/players")
+    data['element_types_df'].write.mode("overwrite").parquet(f"./data/positions")
+
+    etl_logger.info('Load finished')
 
 
 if __name__ == "__main__":

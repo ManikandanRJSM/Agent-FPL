@@ -1,6 +1,8 @@
 from transformers import pipeline
 import torch
 from langchain.chat_models import init_chat_model
+from langchain_huggingface import HuggingFaceEndpoint, ChatHuggingFace
+import os
 
 class ModelConfigurations:
 
@@ -26,22 +28,20 @@ class ModelConfigurations:
         }
     
     @staticmethod
-    def get_hf_lang_chain_model_config():
+    def get_hf_lang_chain_model_config(): # Runs in Hugginface inference
+        llm = HuggingFaceEndpoint(
+            repo_id="Qwen/Qwen2.5-7B-Instruct",
+            temperature=0.5,
+            max_new_tokens=2048,
+            timeout=300,
+        )
+        return ChatHuggingFace(llm=llm)
+    
+
+    def get_hf_local_lang_chain_model_config():
         return init_chat_model(
-            "huggingface:meta-llama/Llama-3.2-3B-Instruct",
-            # model_provider="huggingface",
+            "huggingface:Qwen/Qwen2.5-7B-Instruct",
             temperature=0.5,
             timeout=300,
-            max_tokens=25000,
-        )
-    
-    @staticmethod
-    def get_gemini_lang_chain_model_config():
-        return init_chat_model(
-            "gemini-2.0-flash",
-            model_provider="google-genai",
-            temperature=0.5,
-            timeout=600,
-            max_tokens=25000,
-            streaming=True,
+            max_tokens=2048,
         )

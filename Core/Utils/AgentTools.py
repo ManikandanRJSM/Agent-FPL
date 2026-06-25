@@ -7,6 +7,7 @@ import json
 def get_manager_details(manager_id : int) -> str:
     """get the manager details based on the manager id. this uses python package called requests to featch the manager details via api call and retrun the manager details as json or give the error repose as json"""
     r = requests.get(f'https://fantasy.premierleague.com/api/entry/{manager_id}')
+
     result = {}
 
     if r.status_code == 200:
@@ -23,6 +24,11 @@ def get_manager_details(manager_id : int) -> str:
             'reagion_long_code' : raw_data['player_region_iso_code_long'],
         }
     json_string = json.dumps(result)
-
+    # print(json_string)
     return json_string
+
+# get_manager_details.invoke({"manager_id": 5125930})
+
+# @tool
+# def get_transfer_suggestions(player_id : int, )
 
