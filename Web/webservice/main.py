@@ -5,9 +5,18 @@ import json
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 from fastapi import FastAPI, Header
+from fastapi.middleware.cors import CORSMiddleware
 from Core.CoreController import Agents
+from webservice.model.AppModels import PlayerModel, ManagerModel
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://127.0.0.1:5000", "http://localhost:5000"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/get_manager_details/{manager_id}")
@@ -40,7 +49,7 @@ def getManagerPlayers(manager_id : int, authorization: str | None = Header(None)
         
         player_data = r.json()['picks']
         manger_data = manger_reqt.json()
-        player_df = spark_session.createDataFrame(player_data);
+        player_df = spark_session.createDataFrame(player_data)
 
         all_players_df = spark_session.read.parquet("../../data/players").alias("players")
         all_teams_df = spark_session.read.parquet("../../data/teams").alias("teams")
@@ -73,3 +82,14 @@ def getManagerPlayers(manager_id : int, authorization: str | None = Header(None)
         }
     
     return data
+
+
+@app.get("/get_squad_suggestion/{manager_id}")
+def getSquadSuggestion(manager_id : int):
+    pass
+
+@app.post("/get_player_suggestion/{manager_id}")
+def getPlayerSuggestion(manager_id : int, manager_data : ManagerModel, player_data : PlayerModel):
+    agents = Agents()
+    data = agents.getPlayerSuggestion(manager_id, manager_data['transfer_balance'], json.dumps(player_data))
+    pass

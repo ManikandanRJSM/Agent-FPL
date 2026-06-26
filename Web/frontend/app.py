@@ -1,4 +1,5 @@
 import requests
+import json
 from flask import Flask, render_template, request, session, redirect, url_for
 
 app = Flask(__name__)
@@ -40,19 +41,18 @@ def players():
 
 @app.route("/transfer", methods=["POST"])
 def transfer():
-    player_id = request.form.get("player_id")
     manager_id = session.get("manager_id")
-    auth_token = session.get("auth_token")
+    player = request.get_json()
 
-    if not player_id or not player_id.isdigit():
-        response = requests.get(
-            f"{API_BASE}/get_manger_players/{manager_id}",
-            headers={"Authorization": auth_token}
-        )
-        players = response.json().get("data", [])
-        return render_template("players.html", players=players, manager_id=manager_id, error="Please enter a valid player ID.")
+    if not player or not manager_id:
+        return {"status": "FAILED", "data": "Missing data"}, 400
 
-    return redirect(url_for("index"))
+    response = requests.post(
+        f"{API_BASE}/get_player_suggestion/{manager_id}",
+        json=player
+    )
+
+    return response.json() if response.status_code == 200 else ({"status": "FAILED"}, 500)
 
 
 if __name__ == "__main__":

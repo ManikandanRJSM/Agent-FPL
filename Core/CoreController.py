@@ -14,7 +14,7 @@ os.environ['HUGGINGFACEHUB_API_TOKEN'] = get_env_variables()['HF_TOKEN']
 # from Utils.Agents import call_manager_detail_subagent
 from Core.Config.ModelConfigurations import ModelConfigurations
 from langchain.messages import HumanMessage
-from Core.Utils.SubAgents import featch_manager_detail_subagent
+from Core.Utils.SubAgents import featch_manager_detail_subagent, player_suggestion_subagent
 
 
 from langchain.agents import create_agent
@@ -44,4 +44,10 @@ class Agents():
         # response = agent.invoke({
         #         "messages" : [HumanMessage(content=f"Get the details for FPL manager 5125930")]
         # })
+        return response["messages"][-1].content_blocks
+
+    def getPlayerSuggestion(self, manager_id : int, transfer_balance : int, player_data : str):
+        response = player_suggestion_subagent.invoke({
+            "messages" : [HumanMessage(content=f"Fetch all the players compare the given player with them and give suggestion for the user here is the selected player details as json {player_data} the manager limit is 1000 currently the manager has {transfer_balance} in the bank")]
+        })
         return response["messages"][-1].content_blocks
