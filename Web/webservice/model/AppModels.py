@@ -1,72 +1,82 @@
 from pydantic import BaseModel
 
 class ManagerModel(BaseModel):
-    manager_id : int
-    transfer_balance : float
+    manager_id: int
+    transfer_balance: int
 
 class PlayerModel(BaseModel):
-    assists: int
-    bonus: int
-    can_select: bool
-    can_transact: bool
-    chance_of_playing_next_round: int | None
-    chance_of_playing_this_round: int | None
-    clean_sheets: int
-    clean_sheets_per_90: float
-    clearances_blocks_interceptions: int
-    cost_change_event: int
-    cost_change_event_fall: int
-    cost_change_start: int
-    cost_change_start_fall: int
-    defensive_contribution: int
-    defensive_contribution_per_90: float
-    event_points: int
-    expected_assists: str
-    expected_assists_per_90: float
-    expected_goal_involvements: str
-    expected_goal_involvements_per_90: float
-    expected_goals: str
-    expected_goals_conceded: str
-    expected_goals_conceded_per_90: float
-    expected_goals_per_90: float
-    first_name: str
-    form: str
-    goals_conceded: int
-    goals_conceded_per_90: float
-    goals_scored: int
-    id: int
-    in_dreamteam: bool
-    minutes: int
-    now_cost: int
-    now_cost_rank: int
-    own_goals: int
-    penalties_missed: int
-    penalties_saved: int
-    points_per_game: str
-    price_change_percent: str
-    recoveries: int
-    red_cards: int
-    saves: int
-    saves_per_90: float
-    second_name: str
-    selected_by_percent: str
-    selected_rank: int
-    starts: int
-    starts_per_90: float
-    status: str
-    tackles: int
-    threat: str
-    total_points: int
-    transfers_in: int
-    transfers_in_event: int
-    transfers_out: int
-    transfers_out_event: int
-    value_form: str
-    value_season: str
-    yellow_cards: int
+    player_assists: int
+    player_bonus: int
+    player_can_select: bool
+    player_can_transact: bool
+    player_chance_of_playing_next_round: int | None = None
+    player_chance_of_playing_this_round: int | None = None
+    player_clean_sheets: int
+    player_clean_sheets_per_90: float
+    player_clearances_blocks_interceptions: int
+    player_cost_change_event: int
+    player_cost_change_event_fall: int
+    player_cost_change_start: int
+    player_cost_change_start_fall: int
+    player_defensive_contribution: int
+    player_defensive_contribution_per_90: float
+    player_event_points: int
+    player_expected_assists: str
+    player_expected_assists_per_90: float
+    player_expected_goal_involvements: str
+    player_expected_goal_involvements_per_90: float
+    player_expected_goals: str
+    player_expected_goals_conceded: str
+    player_expected_goals_conceded_per_90: float
+    player_expected_goals_per_90: float
+    player_first_name: str
+    player_form: str
+    player_goals_conceded: int
+    player_goals_conceded_per_90: float
+    player_goals_scored: int
+    player_id: int
+    player_in_dreamteam: bool
+    player_known_name: str
+    player_minutes: int
+    player_now_cost: int
+    player_now_cost_rank: int
+    player_own_goals: int
+    player_penalties_missed: int
+    player_penalties_order: int | None = None
+    player_penalties_saved: int
+    player_points_per_game: str
+    player_price_change_percent: str
+    player_recoveries: int
+    player_red_cards: int
+    player_saves: int
+    player_saves_per_90: float
+    player_second_name: str
+    player_selected_by_percent: str
+    player_selected_rank: int
+    player_starts: int
+    player_starts_per_90: float
+    player_status: str
+    player_tackles: int
+    player_threat: str
+    player_total_points: int
+    player_transfers_in: int
+    player_transfers_in_event: int
+    player_transfers_out: int
+    player_transfers_out_event: int
+    player_value_form: str
+    player_value_season: str
+    player_yellow_cards: int
+    player_element_type: int
+    player_element_type_name_long: str
+    player_element_type_name_short: str
     is_captain: bool
     is_vice_captain: bool
     purchase_price: int
-    code: int
-    name: str
-    short_name: str
+    team_code: int
+    team_id: int
+    team_name: str
+    team_short_name: str
+
+class PlayerSuggestionRequest(BaseModel):
+    manager_data: ManagerModel
+    player_data: PlayerModel

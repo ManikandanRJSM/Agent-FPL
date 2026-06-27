@@ -31,5 +31,23 @@ def get_manager_details(manager_id : int) -> str:
 
 @tool
 def get_player_suggestion(player_data : str, transfer_balance : int) -> str:
-    """Suggest the best player to transfer based on the given player data JSON and the manager's transfer balance.""" 
-    pass
+    """Suggest the best player to transfer based on the given player data JSON and the manager's transfer balance. you will get all the players data here as JSON compare the player data with players JSON and give the suggestion""" 
+    from Utils.SparkUtils import SparkSessionFactory
+    from Constants.DataConstants import players_columns, teams_columns
+    import json
+
+    player_data_dict = json.loads(player_data)
+    spark_session = SparkSessionFactory.create_spark_session()
+
+    all_players_df = spark_session.read.parquet("../../data/players")
+
+    players_df = all_players_df \
+        .filter( (all_players_df.player_id !=  player_data_dict['player_id']) & (all_players_df.player_element_type ==  player_data_dict['player_element_type'])) \
+        .select(*players_columns, *teams_columns)
+
+    data_to_llm = {
+        'user_selected_player_data' : player_data,
+        'all_player_data' : [json.loads(row) for row in players_df.toJSON().collect()]
+    }
+    json_string = json.dumps(data_to_llm)
+    return json_string

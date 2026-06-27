@@ -1,13 +1,17 @@
 import sys
 import os
 import json
+import logging
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 from fastapi import FastAPI, Header
 from fastapi.middleware.cors import CORSMiddleware
 from Core.CoreController import Agents
-from webservice.model.AppModels import PlayerModel, ManagerModel
+from webservice.model.AppModels import PlayerModel, ManagerModel, PlayerSuggestionRequest
+
+webservice_logger = logging.getLogger(__name__)
+logging.basicConfig(filename='../../logs/webservice_logs/api.log', level=logging.INFO)
 
 app = FastAPI()
 
@@ -88,7 +92,7 @@ def getSquadSuggestion(manager_id : int):
     pass
 
 @app.post("/get_player_suggestion/{manager_id}")
-def getPlayerSuggestion(manager_id : int, manager_data : ManagerModel, player_data : PlayerModel):
+def getPlayerSuggestion(manager_id : int, request : PlayerSuggestionRequest):
     agents = Agents()
-    data = agents.getPlayerSuggestion(manager_id, manager_data['transfer_balance'], json.dumps(player_data))
-    pass
+    data = agents.getPlayerSuggestion(manager_id, request.manager_data.transfer_balance, json.dumps(request.player_data.model_dump()))
+    return {"status": "SUCCESS", "data": data}

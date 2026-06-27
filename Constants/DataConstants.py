@@ -63,7 +63,9 @@ players_columns = [
     'player_element_type',
     'is_captain',
     'is_vice_captain',
-    'purchase_price'
+    'purchase_price',
+    'player_element_type_name_long',
+    'player_element_type_name_short'
 ]
 
 
