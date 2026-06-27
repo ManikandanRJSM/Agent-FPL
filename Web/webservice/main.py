@@ -51,12 +51,11 @@ def getManagerPlayers(manager_id : int, authorization: str | None = Header(None)
         manger_data = manger_reqt.json()
         player_df = spark_session.createDataFrame(player_data)
 
-        all_players_df = spark_session.read.parquet("../../data/players").alias("players")
-        all_teams_df = spark_session.read.parquet("../../data/teams").alias("teams")
+        all_players_df = spark_session.read.parquet("../../data/players")
+        
         joined_df = (
             player_df
-            .join(broadcast(all_players_df), player_df["element"] == all_players_df["id"], how="inner")
-            .join(broadcast(all_teams_df), all_players_df["team"] == all_teams_df["id"], how="inner")
+            .join(broadcast(all_players_df), player_df["element"] == all_players_df["player_id"], how="inner")
             .select(*players_columns, *teams_columns)
         )
         

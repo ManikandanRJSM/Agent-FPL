@@ -1,5 +1,7 @@
 import sys
 import os
+import traceback
+
 
 # Get the absolute path to the parent directory
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -9,7 +11,7 @@ if parent_dir not in sys.path:
 
 
 from Utils.SparkUtils import SparkSessionFactory
-from pyspark.sql import function as F, DataFrame
+from pyspark.sql import functions as F, DataFrame
 #from helpers.GetEnv import GetEnv
 import requests
 import json
@@ -32,7 +34,8 @@ def extract() -> None:
 
             etl_logger.info('Extract Finished Passing to transform function')
     except Exception as e:
-        etl_logger.error(e)
+        error_string = traceback.format_exc()
+        etl_logger.error(error_string)
 
 
 def transform(teams : list, players : list, postion : list) -> None:
@@ -50,10 +53,14 @@ def transform(teams : list, players : list, postion : list) -> None:
     players_rdd = spark_session.sparkContext.parallelize([json.dumps(p) for p in players])
     players_df = spark_session.read.json(players_rdd)
 
-    players_df = players_df.withColumn({
-        'element_type_name_long' : element_types.get(F.col('element_type'))['singular_name'],
-        'element_type_name_short' : element_types.get(F.col('element_type'))['singular_name_short']
-    }).alias("player")
+    long_name_map = F.create_map(*[x for k, v in element_types.items() for x in (F.lit(int(k)), F.lit(v['singular_name']))])
+    short_name_map = F.create_map(*[x for k, v in element_types.items() for x in (F.lit(int(k)), F.lit(v['singular_name_short']))])
+
+    players_df = (
+        players_df
+        .withColumn('element_type_name_long', long_name_map[F.col('element_type')])
+        .withColumn('element_type_name_short', short_name_map[F.col('element_type')])
+    )
 
     teams_rdd = spark_session.sparkContext.parallelize([json.dumps(t) for t in teams])
     teams_df = spark_session.read.json(teams_rdd).alias("team")

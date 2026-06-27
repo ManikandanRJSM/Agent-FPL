@@ -29,6 +29,7 @@ def get_manager_details(manager_id : int) -> str:
 
 # get_manager_details.invoke({"manager_id": 5125930})
 
-
+@tool
 def get_player_suggestion(player_data : str, transfer_balance : int) -> str:
+    """Suggest the best player to transfer based on the given player data JSON and the manager's transfer balance.""" 
     pass

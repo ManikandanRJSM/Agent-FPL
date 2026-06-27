@@ -1,5 +1,3 @@
-from transformers import pipeline
-import torch
 from langchain.chat_models import init_chat_model
 from langchain_huggingface import HuggingFaceEndpoint, ChatHuggingFace
 import os
@@ -8,6 +6,8 @@ class ModelConfigurations:
 
     @staticmethod
     def get_model_config() -> object:
+        from transformers import pipeline
+        import torch
         model_id = "meta-llama/Llama-3.2-3B"
         pipe = pipeline(
             "text-generation",

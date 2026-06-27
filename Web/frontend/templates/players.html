@@ -83,18 +83,25 @@
                     <thead>
                         <tr>
                             <th>Player</th>
+                            <th>Position</th>
                             <th>Value</th>
                             <th>Team</th>
                         </tr>
                     </thead>
                     <tbody class="text-dark">
+                        {% set pos_map = {1: 'GKP', 2: 'DEF', 3: 'MID', 4: 'FWD'} %}
                         {% for p in players %}
-                        <tr data-player-id="{{ p.id }}" data-player-name="{{ p.first_name }} {{ p.second_name }}" data-player='{{ p | tojson }}' onclick="selectPlayer(this)">
-                            <td><strong>{{ p.first_name }} {{ p.second_name }}</strong></td>
-                            <td class="cost">&pound;{{ "%.1f"|format(p.now_cost / 10) }}m</td>
+                        <tr data-player-id="{{ p.player_id }}" data-player-name="{{ p.player_first_name }} {{ p.player_second_name }}" data-player='{{ p | tojson }}' onclick="selectPlayer(this)">
                             <td>
-                                {{ p.name }}
-                                <span class="badge-team ms-1">{{ p.short_name }}</span>
+                                <strong>{{ p.player_first_name }} {{ p.player_second_name }}</strong>
+                                {% if p.is_captain %}<span class="badge-team ms-1">C</span>{% endif %}
+                                {% if p.is_vice_captain %}<span class="badge-team ms-1">V</span>{% endif %}
+                            </td>
+                            <td><span class="badge-team">{{ pos_map.get(p.player_element_type, '?') }}</span></td>
+                            <td class="cost">&pound;{{ "%.1f"|format(p.player_now_cost / 10) }}m</td>
+                            <td>
+                                {{ p.team_name }}
+                                <span class="badge-team ms-1">{{ p.team_short_name }}</span>
                             </td>
                         </tr>
                         {% endfor %}
